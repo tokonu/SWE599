@@ -19,6 +19,7 @@ Requirements v1.0
     3. User shall be able to list posts belonging to a group.
     4. Every post shall include a message thread.
     5. User shall be able to send a message to any post that belongs to a group that the user joined.
+    6. Messages shall be updated in realtime.
 
 
 ## Non-functional requirements
