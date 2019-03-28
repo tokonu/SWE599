@@ -10,6 +10,8 @@ class TestsAuth(BaseTestCase):
         r, s, h = self.get('auth/signup')
         self.assertEqual(s, 405)
 
+        # todo me
+
     def test_email_validation(self):
         from server.utils import is_email_valid
         valid_emails = ["f@b.co",
@@ -81,3 +83,5 @@ class TestsAuth(BaseTestCase):
         self.assertEqual(s, 400)
         self.assertEqual(r["message"], "Invalid credentials")
 
+    # todo test me
+    # todo test admin route auth

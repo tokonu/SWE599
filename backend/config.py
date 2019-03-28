@@ -8,7 +8,12 @@ class Config(object):
     DEBUG = False
     TESTING = False
     SECRET_KEY = "default-secret"
+
+    ''' JWT '''
     JWT_SECRET_KEY = "more-secret"
+    JWT_ACCESS_TOKEN_EXPIRES = 30 * 24 * 60 * 60
+
+    ''' SQLAlchemy '''
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'db.sqlite'))
     SQLALCHEMY_TRACK_MODIFICATIONS = False

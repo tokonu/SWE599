@@ -1,1 +1,1 @@
-from . import user
+from . import tag, post, group, user  # has to be in this order
