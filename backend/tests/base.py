@@ -1,7 +1,8 @@
 from unittest import TestCase
 import json
 from server import create_app, db
-# from sqlalchemy import inspect
+from datetime import timedelta
+import time
 
 
 # noinspection PyBroadException
@@ -64,3 +65,38 @@ class BaseTestCase(TestCase):
 
     def login_user(self, email=None, password=None):
         return self.post('/auth/login', {'email': email, "password": password})
+
+    def get_token(self, email="a@b.com", password="foo"):
+        r, s, h = self.signup_user(email, password)
+        return r["token"]
+
+    def endpoint_auth_tester(self, endpoints):
+        self.app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(milliseconds=200)
+        token = self.get_token(email="a@b.com")
+
+        for url, method in endpoints:
+            func = self.get if method == "get" else self.post
+            # no token
+            r, s, h = func(url=url, token=None)
+            self.assertEqual(s, 401, msg=url)
+            self.assertEqual(r["message"], "unauthorized", msg=url)
+            # incorrect token
+            r, s, h = func(url=url, token="foo")
+            self.assertEqual(s, 401, msg=url)
+            self.assertEqual(r["message"], "invalid_token", msg=url)
+
+        # method not allowed
+        for url, method in endpoints:
+            func = self.get if method == "post" else self.post
+            # no token
+            r, s, h = func(url=url, token=None)
+            self.assertEqual(s, 405, msg=url)
+
+        time.sleep(1.5)
+        # expired token
+        for url, method in endpoints:
+            func = self.get if method == "get" else self.post
+
+            r, s, h = func(url=url, token=token)
+            self.assertEqual(s, 401, msg=url)
+            self.assertEqual(r["message"], "expired_token", msg=url)

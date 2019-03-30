@@ -1,15 +1,11 @@
 from .base import BaseTestCase
 from server.models.user import User
 from server.models.group import Group
-import time
-from datetime import timedelta
 
 
 class TestsGroup(BaseTestCase):
 
     def test_endpoint_auth(self):
-        self.app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(milliseconds=200)
-        token = self.get_token(email="a@b.com")
 
         endpoints = [
             ("groups/create", "post"),
@@ -18,36 +14,7 @@ class TestsGroup(BaseTestCase):
             ("groups/1/leave", "post")
         ]
 
-        for url, method in endpoints:
-            func = self.get if method == "get" else self.post
-            # no token
-            r, s, h = func(url=url, token=None)
-            self.assertEqual(s, 401, msg=url)
-            self.assertEqual(r["message"], "unauthorized", msg=url)
-            # incorrect token
-            r, s, h = func(url=url, token="foo")
-            self.assertEqual(s, 401, msg=url)
-            self.assertEqual(r["message"], "invalid_token", msg=url)
-
-        # method not allowed
-        for url, method in endpoints:
-            func = self.get if method == "post" else self.post
-            # no token
-            r, s, h = func(url=url, token=None)
-            self.assertEqual(s, 405, msg=url)
-
-        time.sleep(1.1)
-        # expired token
-        for url, method in endpoints:
-            func = self.get if method == "get" else self.post
-
-            r, s, h = func(url=url, token=token)
-            self.assertEqual(s, 401, msg=url)
-            self.assertEqual(r["message"], "expired_token", msg=url)
-
-    def get_token(self, email="a@b.com", password="foo"):
-        r, s, h = self.signup_user(email, password)
-        return r["token"]
+        self.endpoint_auth_tester(endpoints)
 
     def create_group(self, name, tags, token=None):
         data = {"name": name}

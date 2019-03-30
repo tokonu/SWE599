@@ -15,7 +15,7 @@ class Group(db.Model):
     name = db.Column(db.String(64), nullable=False, unique=True)
     created_at = db.Column(db.Integer, default=timestamp)
     updated_at = db.Column(db.Integer, default=timestamp, onupdate=timestamp)
-    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     posts = db.relationship('Post', backref="group", lazy="dynamic")
     tags = db.relationship('Tag', secondary=group_tag_table, backref=db.backref('groups', lazy="dynamic"))
 
