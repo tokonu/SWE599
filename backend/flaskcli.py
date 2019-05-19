@@ -1,5 +1,4 @@
 from server import create_app
-import click
 from flask.cli import AppGroup
 from server import db
 
@@ -9,6 +8,7 @@ app = create_app("development")
 '''
 Test
 '''
+
 
 @app.cli.command("test")
 def test():

@@ -13,7 +13,7 @@ Api documentation is available [here](https://swe599onur.docs.apiary.io/)
 
 #### Option 1: With Docker
 
-@TODO
+@todo
 
 #### Option 2: With virtual env
 
@@ -83,4 +83,44 @@ Save and apply.<br>
 [Then Follow this step](http://flask.pocoo.org/docs/1.0/cli/#pycharm-integration)
 ### Production
 
-@todo
+Warning: This project contains some bad practices and is not meant to be used in production. 
+The sole purpose is to showcase the project. An incomplete list of what needs to be fixed:
+1. Do not commit any secret to version control
+2. Do not commit any key-pair to version control
+3. Do not use sqlite in production
+4. If you ignore #3 at least do not create db file in a docker container, containers should be stateless.
+5. Separate your socket and restful api servers.
+6. Use https
+
+<b>Step 1</b><br>
+Launch an Ubuntu 18 instance in aws and connect to your instance
+```
+$ ssh -i /path/to/key-pair.pem ubuntu@dns-name 
+```
+<b>Step 2</b><br>
+Install Docker
+```
+$ sudo apt update
+$ sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+$ sudo apt update
+$ apt-cache policy docker-ce
+$ sudo apt install docker-ce -y
+$ sudo usermod -aG docker ${USER}
+```
+Log out of the server and log back in to apply new permissions.
+
+<b>Step 3</b><br>
+Clone git repo
+
+```
+$ git clone https://github.com/tokonu/SWE599.git
+$ cd SWE599/backend
+```
+<b>Step 4</b><br>
+Build and run docker container
+``` 
+$ docker build --tag=swe .
+$ docker run -d -p 80:5000 swe
+```
