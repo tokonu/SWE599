@@ -16,12 +16,6 @@ class TestsGroup(BaseTestCase):
 
         self.endpoint_auth_tester(endpoints)
 
-    def create_group(self, name, tags, token=None):
-        data = {"name": name}
-        if tags:
-            data["tags"] = tags
-        return self.post("groups/create", data=data, token=token)
-
     def test_create_group(self):
         email = "a@b.com"
         token = self.get_token(email=email)

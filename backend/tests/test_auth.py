@@ -10,7 +10,8 @@ class TestsAuth(BaseTestCase):
         r, s, h = self.get('auth/signup')
         self.assertEqual(s, 405)
 
-        # todo me
+        r, s, h = self.post('auth/me')
+        self.assertEqual(s, 405)
 
     def test_email_validation(self):
         from server.utils import is_email_valid
@@ -83,5 +84,26 @@ class TestsAuth(BaseTestCase):
         self.assertEqual(s, 400)
         self.assertEqual(r["message"], "Invalid credentials")
 
-    # todo test me
+    def test_me(self):
+        email = "a@b.com"
+        token = self.get_token(email=email)
+
+        r, s, h = self.get("/auth/me", token=token)
+        self.assertDictEqual(r, {"id": 1, "email": "a@b.com", "groups": []})
+
+        # create groups
+        r, s, h = self.create_group(name="foo", tags=None, token=token)
+        r, s, h = self.create_group(name="bar", tags=["baz"], token=token)
+
+        r, s, h = self.get("/auth/me", token=token)
+        self.assertEqual(s, 200)
+        self.assertEqual(r["id"], 1)
+        self.assertEqual(r["email"], "a@b.com")
+        self.assertEqual(len(r["groups"]), 2)
+        for group in r["groups"]:
+            if group["name"] == "foo":
+                self.assertDictEqual(group, {"id": 1, "name": "foo", "tags": []})
+            if group["name"] == "bar":
+                self.assertDictEqual(group, {"id": 2, "name": "bar", "tags": ["baz"]})
+
     # todo test admin route auth

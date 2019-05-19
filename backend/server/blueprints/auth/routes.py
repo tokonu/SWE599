@@ -5,7 +5,8 @@ from server.utils import is_email_valid, bad_request
 from webargs.flaskparser import FlaskParser
 from server.models.user import User, user_schema
 from server import db
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_current_user
+from server.models.user import user_schema
 
 '''
 Helpers
@@ -90,6 +91,20 @@ def signup():
         return jsonify(rd), 201
     except AuthRequestException as e:
         return bad_request(e.get_message(), 400)
+
+
+''' Me '''
+
+
+@bp.route("/me", methods=["GET"])
+@jwt_required
+def me():
+    user: User = get_current_user()
+    result = user_schema.dump(user).data
+    result["groups"] = []
+    for group in user.groups:
+        result["groups"].append(group.as_dict())
+    return jsonify(result), 200
 
 
 @bp.route("/env", methods=["GET"])

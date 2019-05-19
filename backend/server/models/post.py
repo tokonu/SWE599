@@ -13,20 +13,20 @@ class Post(db.Model):
     updated_at = db.Column(db.Integer, default=timestamp, onupdate=timestamp)
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable=False)
+    messages = db.relationship('Message', backref="post", lazy="dynamic")
 
     def as_dict(self):
-        d = post_schema.dump(self).data
-        if self.creator.username:
-            d["creator-username"] = self.creator.username
-        return d
+        return post_schema.dump(self).data
 
 
 class PostSchema(ma.ModelSchema):
     class Meta:
         model = Post
-        fields = ("id", "title", "description", "created_at", "group_id")
+        fields = ("id", "title", "description", "created_at", "group_id", "creator_id")
     created_at = fields.Number(dump_to="created-at")
     group_id = fields.Number(dump_to="group-id")
+    creator_id = fields.Number(dump_to="creator-id")
+
 
 post_schema = PostSchema()
 posts_schema = PostSchema(many=True)

@@ -5,9 +5,11 @@ from config import config
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_admin import Admin
+from flask_socketio import SocketIO
 
 db = SQLAlchemy()
 ma = Marshmallow()
+socketio = SocketIO()
 
 import server.models
 
@@ -18,7 +20,9 @@ def create_app(config_name=None):
 
     app = Flask(__name__)
     # app.config.from_object('config.{}'.format(config_name.capitalize()))
-    app.config.from_object(config[config_name])
+    app.config.from_object(config[config_name.lower()])
+
+    socketio.init_app(app)
 
     db.init_app(app)
     ma.init_app(app)
@@ -36,5 +40,7 @@ def create_app(config_name=None):
 
     from .blueprints.group import bp as groups_bp
     app.register_blueprint(groups_bp, url_prefix="/groups")
+
+    from server import socket
 
     return app

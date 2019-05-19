@@ -1,3 +1,4 @@
+from server.models.message import Message
 from server.models.post import Post
 from server.utils import bad_request
 from . import bp
@@ -46,7 +47,6 @@ List Posts
 @bp.route("/<int:group_id>/posts", methods=["GET"])
 @jwt_required
 def list_posts(group_id):
-
     group = Group.query.get(group_id)
     if not group:
         return "", 404
@@ -55,4 +55,21 @@ def list_posts(group_id):
     return jsonify({
         "group-id": group_id,
         "posts": [p.as_dict() for p in posts]
+    }), 200
+
+
+''' Get Messages'''
+
+
+@bp.route("/<int:group_id>/posts/<int:post_id>/messages", methods=["GET"])
+@jwt_required
+def get_messages(group_id, post_id):
+    post = Post.query.get(post_id)
+    if not post:
+        return "", 404
+
+    messages = post.messages.order_by(Message.created_at).all()
+    return jsonify({
+        "post-id": post_id,
+        "messages": [m.as_dict() for m in messages]
     }), 200

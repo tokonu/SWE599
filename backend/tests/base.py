@@ -70,6 +70,19 @@ class BaseTestCase(TestCase):
         r, s, h = self.signup_user(email, password)
         return r["token"]
 
+    def create_group(self, name, tags, token=None):
+        data = {"name": name}
+        if tags:
+            data["tags"] = tags
+        return self.post("groups/create", data=data, token=token)
+
+    def create_post(self, group_id, title, description, token=None):
+        data = {
+            "title": title,
+            "description": description
+        }
+        return self.post(f"groups/{group_id}/posts/create", data=data, token=token)
+
     def endpoint_auth_tester(self, endpoints):
         self.app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(milliseconds=200)
         token = self.get_token(email="a@b.com")
